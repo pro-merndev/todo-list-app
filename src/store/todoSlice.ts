@@ -5,6 +5,8 @@ interface Todo {
   text: string;
   completed: boolean;
   priority: "low" | "medium" | "high";
+  category?: string;
+  dueDate?: string;
 }
 
 interface TodoState {
