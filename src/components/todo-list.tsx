@@ -31,6 +31,7 @@ import {
   SelectItem,
 } from "./ui/select";
 import { Search } from "lucide-react";
+import { toast } from "sonner";
 
 const priorityColors = {
   low: "text-green-500",
@@ -95,8 +96,13 @@ export function TodoList() {
     e.preventDefault();
     if (newTodo.trim()) {
       dispatch(addTodo({ text: newTodo, priority: newTodoPriority }));
+      toast.success("Task added successfully!", {
+        description: `Added "${newTodo}" with ${newTodoPriority} priority`,
+      });
       setNewTodo("");
       setNewTodoPriority("low");
+    } else {
+      toast.error("Please enter a task");
     }
   };
 
@@ -107,6 +113,23 @@ export function TodoList() {
     const currentIndex = priorities.indexOf(currentPriority);
     const newPriority = priorities[(currentIndex + 1) % priorities.length];
     dispatch(updateTodoPriority({ id, priority: newPriority }));
+    toast.success("Priority updated");
+  };
+
+  const handleToggle = (id: number) => {
+    dispatch(toggleTodo(id));
+    const todo = todos.find((t) => t.id === id);
+    toast.success(
+      todo?.completed ? "Task marked as incomplete" : "Task completed! 🎉"
+    );
+  };
+
+  const handleRemove = (id: number) => {
+    const todo = todos.find((t) => t.id === id);
+    dispatch(removeTodo(id));
+    toast.success("Task removed", {
+      description: `"${todo?.text}" has been deleted`,
+    });
   };
 
   const filteredTodos = todos
@@ -276,7 +299,7 @@ export function TodoList() {
             className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center gap-4"
           >
             <Button
-              onClick={() => dispatch(toggleTodo(todo.id))}
+              onClick={() => handleToggle(todo.id)}
               className={cn(
                 "w-6 h-6 rounded-full border-2 flex items-center justify-center p-0 hover:bg-blue-500",
                 todo.completed
@@ -305,7 +328,7 @@ export function TodoList() {
               <Flag className="w-5 h-5" />
             </Button>
             <Button
-              onClick={() => dispatch(removeTodo(todo.id))}
+              onClick={() => handleRemove(todo.id)}
               className="text-red-500 hover:text-red-700"
               variant="ghost"
             >
