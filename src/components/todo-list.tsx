@@ -144,7 +144,8 @@ export function TodoList() {
     .filter((todo) => {
       if (filterPriority === "all") return true;
       return todo.priority === filterPriority;
-    });
+    })
+    .reverse();
 
   const filterControls = (
     <div className="mb-6 flex flex-col sm:flex-row gap-4">
@@ -296,44 +297,51 @@ export function TodoList() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center gap-4"
+            className="bg-white p-4 rounded-lg shadow-sm border border-gray-200"
           >
-            <Button
-              onClick={() => handleToggle(todo.id)}
-              className={cn(
-                "w-6 h-6 rounded-full border-2 flex items-center justify-center p-0 hover:bg-blue-500",
-                todo.completed
-                  ? "bg-green-500 border-green-600"
-                  : "bg-white border-gray-300"
-              )}
-            >
-              {todo.completed && <Check className="w-4 h-4 text-white" />}
-            </Button>
-            <span
-              className={cn(
-                "flex-1 text-lg",
-                todo.completed && "line-through text-gray-400"
-              )}
-            >
-              {todo.text}
-            </span>
-            <Button
-              onClick={() => handlePriorityChange(todo.id)}
-              className={cn(
-                "text-gray-500 hover:text-gray-700",
-                priorityColors[todo.priority]
-              )}
-              variant="ghost"
-            >
-              <Flag className="w-5 h-5" />
-            </Button>
-            <Button
-              onClick={() => handleRemove(todo.id)}
-              className="text-red-500 hover:text-red-700"
-              variant="ghost"
-            >
-              <Trash2 className="w-5 h-5" />
-            </Button>
+            <div className="flex items-center gap-4">
+              <Button
+                onClick={() => handleToggle(todo.id)}
+                className={cn(
+                  "w-6 h-6 rounded-full border-2 flex items-center justify-center p-0 hover:bg-blue-500",
+                  todo.completed
+                    ? "bg-green-500 border-green-600"
+                    : "bg-white border-gray-300"
+                )}
+              >
+                {todo.completed && <Check className="w-4 h-4 text-white" />}
+              </Button>
+              <div className="flex-1">
+                <span
+                  className={cn(
+                    "text-lg block",
+                    todo.completed && "line-through text-gray-400"
+                  )}
+                >
+                  {todo.text}
+                </span>
+                <span className="text-sm text-gray-500">
+                  {new Date(todo.createdAt).toLocaleString()}
+                </span>
+              </div>
+              <Button
+                onClick={() => handlePriorityChange(todo.id)}
+                className={cn(
+                  "text-gray-500 hover:text-gray-700",
+                  priorityColors[todo.priority]
+                )}
+                variant="ghost"
+              >
+                <Flag className="w-5 h-5" />
+              </Button>
+              <Button
+                onClick={() => handleRemove(todo.id)}
+                className="text-red-500 hover:text-red-700"
+                variant="ghost"
+              >
+                <Trash2 className="w-5 h-5" />
+              </Button>
+            </div>
           </motion.div>
         ))}
       </div>
