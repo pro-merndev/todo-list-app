@@ -12,7 +12,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Check, Trash2, Flag, Circle } from "lucide-react";
+import {
+  Plus,
+  Check,
+  Trash2,
+  Flag,
+  Circle,
+  SearchX,
+  PackageSearch,
+  ListX,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Select,
@@ -179,6 +188,135 @@ export function TodoList() {
     </div>
   );
 
+  const EmptyState = () => (
+    <div className="flex flex-col items-center justify-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+      <PackageSearch className="h-12 w-12 text-gray-400 mb-4" />
+      <h3 className="text-lg font-medium text-gray-900 mb-1">No tasks yet</h3>
+      <p className="text-gray-500 text-center max-w-sm mb-4">
+        Get started by adding your first task using the form above
+      </p>
+      <Button
+        onClick={() =>
+          (
+            document.querySelector('input[name="todo"]') as HTMLInputElement
+          )?.focus()
+        }
+        variant="outline"
+      >
+        Add Your First Task
+      </Button>
+    </div>
+  );
+
+  const NoSearchResults = () => (
+    <div className="flex flex-col items-center justify-center py-12 bg-gray-50 rounded-lg">
+      <SearchX className="h-12 w-12 text-gray-400 mb-4" />
+      <h3 className="text-lg font-medium text-gray-900 mb-1">
+        No matching tasks found
+      </h3>
+      <p className="text-gray-500 text-center max-w-sm mb-4">
+        {searchQuery && `No tasks match "${searchQuery}"`}
+        {filterStatus !== "all" && ` in ${filterStatus} status`}
+        {filterPriority !== "all" && ` with ${filterPriority} priority`}
+      </p>
+      <div className="flex gap-3">
+        <Button
+          onClick={() => {
+            setSearchQuery("");
+            setFilterStatus("all");
+            setFilterPriority("all");
+          }}
+          variant="outline"
+        >
+          Clear All Filters
+        </Button>
+      </div>
+    </div>
+  );
+
+  const NoFilterResults = () => (
+    <div className="flex flex-col items-center justify-center py-12 bg-gray-50 rounded-lg">
+      <ListX className="h-12 w-12 text-gray-400 mb-4" />
+      <h3 className="text-lg font-medium text-gray-900 mb-1">
+        No {filterStatus === "completed" ? "completed" : "active"} tasks
+      </h3>
+      <p className="text-gray-500 text-center max-w-sm mb-4">
+        {filterStatus === "completed"
+          ? "Complete some tasks to see them here"
+          : "All tasks are completed! Add more tasks to stay productive"}
+      </p>
+      <Button onClick={() => setFilterStatus("all")} variant="outline">
+        Show All Tasks
+      </Button>
+    </div>
+  );
+
+  const renderTodoList = () => {
+    if (todos.length === 0) {
+      return <EmptyState />;
+    }
+
+    if (filteredTodos.length === 0) {
+      if (searchQuery || filterPriority !== "all") {
+        return <NoSearchResults />;
+      }
+      if (filterStatus !== "all") {
+        return <NoFilterResults />;
+      }
+    }
+
+    return (
+      <div className="space-y-4">
+        {filteredTodos.map((todo) => (
+          <motion.div
+            key={todo.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center gap-4"
+          >
+            <Button
+              onClick={() => dispatch(toggleTodo(todo.id))}
+              className={cn(
+                "w-6 h-6 rounded-full border-2 flex items-center justify-center p-0 hover:bg-blue-500",
+                todo.completed
+                  ? "bg-green-500 border-green-600"
+                  : "bg-white border-gray-300"
+              )}
+            >
+              {todo.completed && <Check className="w-4 h-4 text-white" />}
+            </Button>
+            <span
+              className={cn(
+                "flex-1 text-lg",
+                todo.completed && "line-through text-gray-400"
+              )}
+            >
+              {todo.text}
+            </span>
+            <Button
+              onClick={() => handlePriorityChange(todo.id)}
+              className={cn(
+                "text-gray-500 hover:text-gray-700",
+                priorityColors[todo.priority]
+              )}
+              variant="ghost"
+            >
+              <Flag className="w-5 h-5" />
+            </Button>
+            <Button
+              onClick={() => dispatch(removeTodo(todo.id))}
+              className="text-red-500 hover:text-red-700"
+              variant="ghost"
+            >
+              <Trash2 className="w-5 h-5" />
+            </Button>
+          </motion.div>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-white text-gray-900 p-8">
       <div className="max-w-4xl mx-auto">
@@ -242,74 +380,7 @@ export function TodoList() {
 
         {statistics}
 
-        <AnimatePresence>
-          {filteredTodos.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="text-center text-gray-500"
-            >
-              <p className="text-xl">
-                Your todo list is empty. Add some tasks to get started!
-              </p>
-            </motion.div>
-          ) : (
-            <div className="space-y-4">
-              {filteredTodos.map((todo) => (
-                <motion.div
-                  key={todo.id}
-                  layout
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                  className={cn(
-                    "flex items-center gap-4 p-4 bg-white rounded-md border transition-all duration-300",
-                    todo.completed ? "border-green-200" : "border-gray-200"
-                  )}
-                >
-                  <Button
-                    onClick={() => dispatch(toggleTodo(todo.id))}
-                    className={cn(
-                      "w-6 h-6 rounded-full border-2 flex items-center justify-center p-0 hover:bg-blue-500",
-                      todo.completed
-                        ? "bg-green-500 border-green-600"
-                        : "bg-white border-gray-300"
-                    )}
-                  >
-                    {todo.completed && <Check className="w-4 h-4 text-white" />}
-                  </Button>
-                  <span
-                    className={cn(
-                      "flex-1 text-lg",
-                      todo.completed && "line-through text-gray-400"
-                    )}
-                  >
-                    {todo.text}
-                  </span>
-                  <Button
-                    onClick={() => handlePriorityChange(todo.id)}
-                    className={cn(
-                      "text-gray-500 hover:text-gray-700",
-                      priorityColors[todo.priority]
-                    )}
-                    variant="ghost"
-                  >
-                    <Flag className="w-5 h-5" />
-                  </Button>
-                  <Button
-                    onClick={() => dispatch(removeTodo(todo.id))}
-                    className="text-red-500 hover:text-red-700"
-                    variant="ghost"
-                  >
-                    <Trash2 className="w-5 h-5" />
-                  </Button>
-                </motion.div>
-              ))}
-            </div>
-          )}
-        </AnimatePresence>
+        {renderTodoList()}
       </div>
     </div>
   );
