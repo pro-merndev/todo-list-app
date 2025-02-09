@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ReduxProvider } from "@/components/redux-provider";
+import { ReduxProvider } from "@/providers/redux-provider";
 import { cn } from "@/lib/utils";
 import { Toaster } from "sonner";
 
