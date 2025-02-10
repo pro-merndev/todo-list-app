@@ -31,7 +31,7 @@ A feature-rich todo list application built with Next.js, Redux Toolkit, and Type
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/todo-list.git
+git clone https://github.com/pro-merndev/todo-list-app.git
 ```
 
 2. Install dependencies:
