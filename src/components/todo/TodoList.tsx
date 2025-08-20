@@ -162,6 +162,13 @@ export function TodoList() {
           </CardHeader>
           <CardContent className="p-4 sm:p-6">
             <Statistics todos={todos} />
+            <AddTodoForm
+              newTodo={newTodo}
+              setNewTodo={setNewTodo}
+              newTodoPriority={newTodoPriority}
+              setNewTodoPriority={setNewTodoPriority}
+              onSubmit={handleSubmit}
+            />
             <SearchFilters
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
@@ -169,13 +176,6 @@ export function TodoList() {
               setFilterPriority={(priority) =>
                 setFilterPriority(priority as "low" | "medium" | "high")
               }
-            />
-            <AddTodoForm
-              newTodo={newTodo}
-              setNewTodo={setNewTodo}
-              newTodoPriority={newTodoPriority}
-              setNewTodoPriority={setNewTodoPriority}
-              onSubmit={handleSubmit}
             />
             <Tabs
               value={activeTab}
